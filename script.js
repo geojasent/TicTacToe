@@ -4,7 +4,9 @@ const game = (() => {
     var player2;
     var computer;
     var tileId;
-    
+    var gameBoardArrayX = [, , , , , , , ,];
+    var gameBoardArrayO = [, , , , , , , ,];
+
     var gameboard = (() => {
         var board = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
         return {board};
@@ -67,14 +69,16 @@ const game = (() => {
             var tileNumber = tile.dataset.number;
             if (player1.shape === "X") {
                 tile.innerHTML = player1.shape;
-                gameboard.board[tileNumber] = player1.shape
+                gameboard.board[tileNumber] = player1.shape;
+                gameBoardArrayX[tileNumber] = player1.shape;
                 player1.shape = "O";
             } else {
                 tile.innerHTML = player1.shape;
-                gameboard.board[tileNumber] = player1.shape
+                gameboard.board[tileNumber] = player1.shape;
+                gameBoardArrayO[tileNumber] = player1.shape;
                 player1.shape = "X";
             }
-            checkWinModule.checkWin();
+            checkWinModule.checkWin(tileNumber);
         };
 
         const checkWinModule = (() => {
@@ -88,10 +92,14 @@ const game = (() => {
                 [0, 4, 8],
                 [2, 4, 6],
             ];
+            //check win condition
+            //iterate through the board for win condition
+            function checkWin(tileNumber) {
 
-            function checkWin() {
+                console.log(gameBoardArrayO)
+                console.log(tileNumber)
                 console.log(gameboard.board)
-                console.log("test");
+
 
             };
             return {checkWin};
