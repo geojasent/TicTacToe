@@ -2,53 +2,81 @@ const game = (() => {
     
     var player1;
     var player2;
-    var computer;
+    // var computer;
     var tileId;
-    var gameBoardArrayX = [, , , , , , , ,];
-    var gameBoardArrayO = [, , , , , , , ,];
+    var win = false;
 
-    var gameboard = (() => {
-        var board = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
-        return {board};
+    var gameBoardFactory = (() => {
+        var board = new Array(9);
+        var boardX = new Array(9);
+        var boardO = new Array(9);
+        return {board, boardX, boardO};
     })();
+
+    var gameBoard = gameBoardFactory.board;
+    var gameBoardX = gameBoardFactory.boardX;
+    var gameBoardO = gameBoardFactory.boardO;
 
     const displayController = (() => {
         const initializePlayers = (() => {
-            var numPlayers = document.getElementsByTagName("button");
-            Array.from(numPlayers).forEach(function(element) {
-                element.addEventListener("click", playerAssign);
-            });
-            
-            function playerAssign() {
-                var buttonPlayer = event.target.id;
+            function addButtonClick() {
+                var numPlayers = document.getElementsByTagName("button");
+                Array.from(numPlayers).forEach(function(element) {
+                element.addEventListener("click", getButtonId);
+                });
+            }
+            addButtonClick();
+            function getButtonId() {
+                var buttonId = event.target.id;
 
-                function playerFactory(buttonId, shape) {
+                function playerFactory(buttonId, shape, ai) {
                     var player = {};
                     player.buttonId = buttonId;
                     player.shape = shape;
+                    player.ai = ai;
                     return player;
                 };
 
-                switch (buttonPlayer) {
-                    case "1player":
-                        player1 = playerFactory("player1", "X");
-                        computer = playerFactory("computer", "O")
-                        break;
-                    case "2player":
-                        player1 = playerFactory("player1", "X");
-                        player2 = playerFactory("player2", "O");
-                        break;
+                if (buttonId == "replay") {
+                    replay();
+                } else {
+                    switch (buttonId) {
+                        case "1player":
+                            player1 = playerFactory("player1", "X");
+                            computer = playerFactory("computer", "O", "true")
+                            break;
+                        case "2player":
+                            player1 = playerFactory("player1", "X");
+                            player2 = playerFactory("player2", "O");
+                            break;
+                        }
+                        return (player1, player2);
                     }
-                    return (player1, player2);
                 }
         })();
 
+        function replay() {
+            player1.shape = "X"
+            gameBoardFactory.board.length = 0;
+            gameBoardFactory.boardO.length = 0;
+            gameBoardFactory.boardX.length = 0;
+            for (i = 0; i < 9; i++) {
+                var boardTileId = document.getElementById(`tile-${i}`);
+                boardTileId.innerHTML = "";
+            }
+            initializeBoard.addTileClick();
+        }
+
         //add event listener for only one click to each tile
         const initializeBoard = (() => {
-            var addClick = document.getElementsByClassName("boardTile");
-            Array.from(addClick).forEach(function(element) {
+            function addTileClick() {
+                var boardTile = document.getElementsByClassName("boardTile");
+                Array.from(boardTile).forEach(function(element) {
                 element.addEventListener("click", getTile);
-            });
+                });
+            }
+            addTileClick();
+            return {addTileClick}
         })();
         
         function getTile() {
@@ -63,22 +91,24 @@ const game = (() => {
             tile.removeEventListener("click", getTile);
         };
 
-        //make this work for each player or computer
-        //conditional for 2 players
+        //maybe in the future make this work for with computer
         function addShape(tile) {
             var tileNumber = tile.dataset.number;
             if (player1.shape === "X") {
                 tile.innerHTML = player1.shape;
-                gameboard.board[tileNumber] = player1.shape;
-                gameBoardArrayX[tileNumber] = player1.shape;
+                gameBoard[tileNumber] = player1.shape;
+                gameBoardX[tileNumber] = player1.shape;
+                checkWinModule.checkWin(tileNumber, player1.shape);
+                displayWin(player1.shape);
                 player1.shape = "O";
             } else {
                 tile.innerHTML = player1.shape;
-                gameboard.board[tileNumber] = player1.shape;
-                gameBoardArrayO[tileNumber] = player1.shape;
+                gameBoard[tileNumber] = player1.shape;
+                gameBoardO[tileNumber] = player1.shape;
+                checkWinModule.checkWin(tileNumber, player1.shape);
+                displayWin(player1.shape);
                 player1.shape = "X";
             }
-            checkWinModule.checkWin(tileNumber);
         };
 
         const checkWinModule = (() => {
@@ -93,23 +123,26 @@ const game = (() => {
                 [2, 4, 6],
             ];
             //check win condition
-            //iterate through the board for win condition
-            function checkWin(tileNumber) {
-
-                console.log(gameBoardArrayO)
-                console.log(tileNumber)
-                console.log(gameboard.board)
-
-
+            function checkWin(tileNumber, shape) {
+                winConditions.forEach((item, index) => {
+                    if (
+                        gameBoard[winConditions[index][0]] === shape && 
+                        gameBoard[winConditions[index][1]] === shape && 
+                        gameBoard[winConditions[index][2]] === shape) {
+                        win = true;
+                    }
+                });
             };
             return {checkWin};
-            //iterate through board and check for x or o
-            //if x or o 3 in a show box with win
+            
         })();
+        //adjust order of when this function runs
+        function displayWin(shape) {
+           if (win === true) {
+            alert(`${shape} wins`)
+            replay();
+            win = false;
+            }
+        }
     })();
-    
-    return {
-        gameboard,
-        displayController
-    }
 })();
