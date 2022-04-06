@@ -87,28 +87,28 @@ const game = (() => {
         };
 
         function removeClick(tile) {
-            addShape(tile);
             tile.removeEventListener("click", getTile);
+            addShape(tile);
         };
 
         //maybe in the future make this work for with computer
         function addShape(tile) {
             var tileNumber = tile.dataset.number;
+            var tempShape = player1.shape;
             if (player1.shape === "X") {
                 tile.innerHTML = player1.shape;
                 gameBoard[tileNumber] = player1.shape;
                 gameBoardX[tileNumber] = player1.shape;
                 checkWinModule.checkWin(tileNumber, player1.shape);
-                displayWin(player1.shape);
                 player1.shape = "O";
             } else {
                 tile.innerHTML = player1.shape;
                 gameBoard[tileNumber] = player1.shape;
                 gameBoardO[tileNumber] = player1.shape;
                 checkWinModule.checkWin(tileNumber, player1.shape);
-                displayWin(player1.shape);
                 player1.shape = "X";
             }
+            displayWin(tempShape);
         };
 
         const checkWinModule = (() => {
